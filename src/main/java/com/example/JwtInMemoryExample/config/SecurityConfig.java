@@ -22,20 +22,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+//        http.csrf(csrf -> csrf.disable())
+//                .authorizeRequests().
+//                requestMatchers("/home/**").authenticated().requestMatchers("/auth/login").permitAll()
+//                .anyRequest()
+//                .authenticated()
+//                .and().exceptionHandling(ex -> ex.authenticationEntryPoint(point))
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
         http.csrf(csrf -> csrf.disable())
-                .authorizeRequests().
-                requestMatchers("/home/**").authenticated().requestMatchers("/auth/login").permitAll()
-                .anyRequest()
-                .authenticated()
-                .and().exceptionHandling(ex -> ex.authenticationEntryPoint(point))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/home/*").authenticated()
+                        .requestMatchers("/auth/login").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(point))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-//        http.authorizeHttpRequests(
-//                authorizationManagerRequestMatcherRegistry ->
-//                    authorizationManagerRequestMatcherRegistry.requestMatchers("/home/**").authenticated()
-//                            .requestMatchers("/auth/login").permitAll().anyRequest().authenticated()
-//        ).exceptionHandling(ex -> ex.authenticationEntryPoint(point))
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
